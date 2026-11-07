@@ -1,0 +1,20 @@
+{"id":"knowledge_01","input":"请查询内部知识库，FAISS支持哪些类型的加速？","expected_skills":["knowledge_search"]}
+{"id":"knowledge_02","input":"根据公司的知识文档说明Qdrant有哪些特点。","expected_skills":["knowledge_search"]}
+{"id":"knowledge_03","input":"从内部文档里查一下LangChain支持哪些向量数据库。","expected_skills":["knowledge_search"]}
+{"id":"knowledge_04","input":"请用知识库内容解释Chroma适合什么场景。","expected_skills":["knowledge_search"]}
+{"id":"knowledge_05","input":"查一下内部故障手册里E102错误的排查步骤。","expected_skills":["knowledge_search"]}
+{"id":"log_01","input":"查询demo环境payment-service从2026-11-07T11:00:00Z到2026-11-07T12:00:00Z的日志，关键词E102。","expected_skills":["log_diagnosis"],"expected_arguments":[{"action":"query","service":"payment-service","environment":"demo","start_time":"2026-11-07T11:00:00Z","end_time":"2026-11-07T12:00:00Z","keyword":"E102"}]}
+{"id":"log_02","input":"检查staging环境order-service在2026-11-06T09:00:00Z至2026-11-06T10:00:00Z之间的错误日志。","expected_skills":["log_diagnosis"],"expected_arguments":[{"action":"query","service":"order-service","environment":"staging","start_time":"2026-11-06T09:00:00Z","end_time":"2026-11-06T10:00:00Z"}]}
+{"id":"log_03","input":"分析这段日志：2026-11-07T11:32:00Z ERROR E102 worker lease expired","expected_skills":["log_diagnosis"],"expected_arguments":[{"action":"analyze_text","log_text":"2026-11-07T11:32:00Z ERROR E102 worker lease expired"}]}
+{"id":"log_04","input":"查询production环境api-gateway从2026-11-05T00:00:00Z到2026-11-05T01:00:00Z的日志。","expected_skills":["log_diagnosis"],"expected_arguments":[{"action":"query","service":"api-gateway","environment":"production","start_time":"2026-11-05T00:00:00Z","end_time":"2026-11-05T01:00:00Z"}]}
+{"id":"log_05","input":"在dev环境worker-service的日志中查找E500，时间范围是2026-11-04T13:00:00Z到2026-11-04T14:00:00Z。","expected_skills":["log_diagnosis"],"expected_arguments":[{"action":"query","service":"worker-service","environment":"dev","start_time":"2026-11-04T13:00:00Z","end_time":"2026-11-04T14:00:00Z","keyword":"E500"}]}
+{"id":"calendar_01","input":"查询我2026年11月5日的日历安排。","expected_skills":["calendar_management"]}
+{"id":"calendar_02","input":"检查我在2026年11月6日下午2点到3点是否有空。","expected_skills":["calendar_management"]}
+{"id":"calendar_03","input":"在2026年11月7日上午10点到11点创建一个项目评审会议。","expected_skills":["calendar_management"]}
+{"id":"calendar_04","input":"把项目评审会议修改到2026年11月7日下午3点到4点。","expected_skills":["calendar_management"]}
+{"id":"calendar_05","input":"查找并准备删除标题为旧项目周会的日程。","expected_skills":["calendar_management"]}
+{"id":"task_01","input":"创建一个待办：2026年11月8日前提交项目报告。","expected_skills":["task_management"]}
+{"id":"task_02","input":"把检查线上告警添加到我的任务列表。","expected_skills":["task_management"]}
+{"id":"task_03","input":"新建待办事项：整理RAG评估结果，优先级设为2。","expected_skills":["task_management"]}
+{"id":"task_04","input":"创建一个任务，提醒我2026年11月10日更新故障手册。","expected_skills":["task_management"]}
+{"id":"task_05","input":"添加待办：完成Calendar接口联调，说明是验证创建和查询流程。","expected_skills":["task_management"]}

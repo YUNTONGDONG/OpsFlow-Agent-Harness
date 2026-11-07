@@ -1,0 +1,7 @@
+{"id":"clarify_calendar_create","input":"帮我创建一个会议。","required_missing_fields":["summary","start","end"]}
+{"id":"clarify_calendar_modify","input":"帮我修改项目评审会议。","required_missing_fields":["start","end"]}
+{"id":"clarify_calendar_availability","input":"帮我检查一下日历有没有空。","required_missing_fields":["time_min","time_max"]}
+{"id":"clarify_calendar_delete","input":"帮我删除一个日程。","required_missing_fields":["summary"]}
+{"id":"clarify_task_create","input":"帮我创建一个待办。","required_missing_fields":["subject"]}
+{"id":"clarify_knowledge","input":"从内部知识库查一下。","required_missing_fields":["query"]}
+{"id":"clarify_web","input":"帮我搜索一下。","required_missing_fields":["query"]}

@@ -1,0 +1,54 @@
+services:
+  app:
+    build: .
+    container_name: pa_slack
+    restart: always
+    depends_on:
+      - redis
+    environment:
+      APP_MODE: ${APP_MODE:-demo}
+      AGENT_RUNTIME: ${AGENT_RUNTIME:-harness}
+      HARNESS_MAX_CONCURRENCY: ${HARNESS_MAX_CONCURRENCY:-4}
+      IDEMPOTENCY_TTL_SECONDS: ${IDEMPOTENCY_TTL_SECONDS:-604800}
+      WORKSPACE_ROOT: ${WORKSPACE_ROOT:-workspaces}
+      WORKSPACE_INLINE_MAX_BYTES: ${WORKSPACE_INLINE_MAX_BYTES:-32768}
+      USER_PROFILE_TTL_SECONDS: ${USER_PROFILE_TTL_SECONDS:-2592000}
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./vector_db:/app/vector_db
+      - ./logs:/app/logs
+      - ./workspaces:/app/workspaces
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    sysctls:
+      - net.ipv4.tcp_mtu_probing=1
+    networks:
+      - host_network
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: xiaolang_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - host_network
+    command: redis-server
+
+networks:
+  host_network:
+    driver: bridge
+
+volumes:
+  redis_data:
+    driver: local
