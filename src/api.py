@@ -17,8 +17,8 @@ from .harness import (
 
 
 app = FastAPI(
-    title="Agent Harness",
-    description="Reproducible baseline API for the Agent Harness project.",
+    title="OpsFlow Agent Harness",
+    description="Reliable agent execution for knowledge retrieval and operational workflows.",
     version="0.1.0",
 )
 
@@ -66,7 +66,7 @@ def get_user_profile_store() -> UserProfileStore:
 @app.get("/")
 def project_info() -> dict[str, str]:
     return {
-        "name": "Agent Harness",
+        "name": "OpsFlow Agent Harness",
         "mode": os.getenv("APP_MODE", "demo"),
         "docs": "/docs",
         "health": "/health",

@@ -1,4 +1,4 @@
-"""Business skills exposed through the Agent Harness."""
+"""Business skills exposed through the OpsFlow Agent Harness."""
 
 from .calendar_management import (
     CalendarAction,

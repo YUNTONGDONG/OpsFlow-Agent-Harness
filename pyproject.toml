@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "pa-slack"
+name = "opsflow-agent-harness"
 version = "0.1.0"
-description = "聊天助手是一个基于 LangChain 框架开发的智能 Agent 教学案例，旨在展示如何构建一个具有实际应用价值的 AI 助手。在当前 AI 技术快速迭代的背景下，掌握 AI Agents 开发已成为技术从业者的必备技能。本项目通过实战案例，帮助开发者快速入门 AI Agents 开发领域。"
+description = "A reliable agent harness for knowledge retrieval and operational workflow automation."
 authors = ["Tomieweb@gmail.com"]
 readme = "README.md"
 packages = [

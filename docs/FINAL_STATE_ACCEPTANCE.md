@@ -1,4 +1,4 @@
-# Agent Harness 最终态验收标准
+# OpsFlow Agent Harness 最终态验收标准
 
 ## 1. 文档目的
 
@@ -17,7 +17,7 @@ Slack / Local Demo / REST API
               ↓
       FastAPI + Adapter
               ↓
-      Agent Harness
+      OpsFlow Agent Harness
   Router → Planner → TaskRunner → Runtime
               ↓
             Skills

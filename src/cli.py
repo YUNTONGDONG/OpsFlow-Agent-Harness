@@ -16,7 +16,7 @@ def run_once(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Send one request to Agent Harness")
+    parser = argparse.ArgumentParser(description="Send one request to OpsFlow")
     parser.add_argument("message", help="User request to execute")
     parser.add_argument("--session-id", default="local-cli")
     parser.add_argument("--user-id", default="local-user")

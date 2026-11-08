@@ -1,4 +1,4 @@
-"""Core building blocks for the Agent Harness runtime."""
+"""Core building blocks for the OpsFlow Agent Harness."""
 
 from .defaults import build_default_registry
 from .factory import build_harness_application

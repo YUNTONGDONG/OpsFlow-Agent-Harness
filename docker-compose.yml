@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: pa_slack
+    container_name: opsflow_app
     restart: always
     depends_on:
       - redis
@@ -35,7 +35,7 @@ services:
 
   redis:
     image: redis:7.4-alpine
-    container_name: xiaolang_redis
+    container_name: opsflow_redis
     restart: always
     ports:
       - "6379:6379"

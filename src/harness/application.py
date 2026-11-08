@@ -1,4 +1,4 @@
-"""Top-level request orchestration for the Agent Harness."""
+"""Top-level request orchestration for the OpsFlow Agent Harness."""
 
 from enum import Enum
 from time import perf_counter

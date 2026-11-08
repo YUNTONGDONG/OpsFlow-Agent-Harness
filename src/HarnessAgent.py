@@ -1,4 +1,4 @@
-"""Shared user-facing adapter for the Agent Harness application."""
+"""Shared user-facing adapter for the OpsFlow Agent Harness."""
 
 import os
 from typing import Any

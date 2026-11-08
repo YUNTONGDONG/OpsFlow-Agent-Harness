@@ -1,13 +1,13 @@
-# Agent Harness
+# OpsFlow Agent Harness
 
-[![unit tests](https://github.com/YUNTONGDONG/agent-harness/actions/workflows/test.yml/badge.svg)](https://github.com/YUNTONGDONG/agent-harness/actions/workflows/test.yml)
+[![unit tests](https://github.com/YUNTONGDONG/opsflow-agent-harness/actions/workflows/test.yml/badge.svg)](https://github.com/YUNTONGDONG/opsflow-agent-harness/actions/workflows/test.yml)
 
-A reliability-oriented runtime for tool-using AI agents. It separates model-driven
-request understanding from deterministic execution, state management, recovery,
-and evidence collection.
+A reliable agent harness for knowledge retrieval and operational workflow
+automation. It separates model-driven request understanding from deterministic
+execution, state management, recovery, and evidence collection.
 
-This repository is not primarily a LangChain chatbot. LangChain is used at the
-model boundary for prompt and structured-output integration. The Agent Harness
+OpsFlow is not primarily a LangChain chatbot. LangChain is used at the model
+boundary for prompt and structured-output integration. The OpsFlow Harness
 owns the execution contract: skill discovery, validated plans, dependency-aware
 scheduling, bounded retries, write safety, durable state, workspace evidence,
 and request-level traces.

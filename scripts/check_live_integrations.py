@@ -193,7 +193,7 @@ def probe_google_write(allow_writes: bool) -> dict[str, Any]:
         event = calendar.events().insert(
             calendarId=calendar_id,
             body={
-                "summary": f"Agent Harness live probe {uuid4()}",
+                "summary": f"OpsFlow live probe {uuid4()}",
                 "start": {"dateTime": start.isoformat()},
                 "end": {"dateTime": end.isoformat()},
             },
@@ -203,7 +203,7 @@ def probe_google_write(allow_writes: bool) -> dict[str, Any]:
             calendarId=calendar_id,
             eventId=event_id,
         ).execute()
-        title = f"Agent Harness live probe {uuid4()}"
+        title = f"OpsFlow live probe {uuid4()}"
         created = tasks.tasks().insert(
             tasklist=tasklist_id,
             body={"title": title, "notes": "Temporary integration probe"},
@@ -254,7 +254,7 @@ def probe_slack_write(allow_writes: bool) -> dict[str, Any]:
         raise SkipProbe("SLACK_BOT_TOKEN and LIVE_SLACK_CHANNEL_ID are required")
     response = WebClient(token=token).chat_postMessage(
         channel=channel,
-        text="Agent Harness temporary live integration probe",
+        text="OpsFlow temporary live integration probe",
     )
     return {
         "message_sent": bool(response.get("ok")),
