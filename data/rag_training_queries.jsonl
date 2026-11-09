@@ -1,0 +1,8 @@
+{"query_id":"train_architecture","query":"How do requests flow through the OpsFlow Agent Harness architecture?","relevant_chunk_ids":["readme-opsflow-agent-harness-architecture-01"]}
+{"query_id":"train_write_safety","query":"How does OpsFlow avoid blindly retrying uncertain external writes?","relevant_chunk_ids":["readme-opsflow-agent-harness-harness-responsibilities-read-and-write-safety-01"]}
+{"query_id":"train_state","query":"What information is stored in Redis versus the Workspace?","relevant_chunk_ids":["readme-opsflow-agent-harness-state-and-storage-model-01"]}
+{"query_id":"train_rag","query":"What retrieval modes are available in the knowledge pipeline?","relevant_chunk_ids":["readme-opsflow-agent-harness-rag-retrieval-and-optional-candidate-compression-01"]}
+{"query_id":"train_live","query":"How are live integration checks separated from deterministic tests?","relevant_chunk_ids":["readme-opsflow-agent-harness-live-integrations-01","live-integration-live-integration-evidence-commands-01"]}
+{"query_id":"train_demo","query":"Which credential-free scenarios demonstrate recovery and safe deletion?","relevant_chunk_ids":["readme-opsflow-agent-harness-credential-free-demo-scenarios-01","demo-credential-free-final-state-demo-what-each-scenario-proves-01"]}
+{"query_id":"train_trace","query":"What does the performance report record?","relevant_chunk_ids":["readme-opsflow-agent-harness-observability-and-performance-reports-01"]}
+{"query_id":"train_migration","query":"Why is the legacy AgentClass not the default runtime?","relevant_chunk_ids":["harness-migration-opsflow-agent-harness-migration-migration-boundary-01"]}

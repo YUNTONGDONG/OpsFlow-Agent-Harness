@@ -1,6 +1,6 @@
 import unittest
 
-from scripts.evaluate_rag import metrics
+from scripts.evaluate_rag import diagnose_drops, metrics
 
 
 class RAGEvaluationTest(unittest.TestCase):
@@ -17,6 +17,20 @@ class RAGEvaluationTest(unittest.TestCase):
             metrics(["chunk"], set()),
             {"recall": 0.0, "mrr": 0.0, "ndcg": 0.0},
         )
+
+    def test_diagnosis_identifies_the_stage_that_drops_relevant_chunks(self):
+        result = diagnose_drops(
+            {"gold-faiss", "gold-svm", "never-found"},
+            {
+                "faiss": ["gold-faiss", "gold-svm", "other"],
+                "faiss_svm": ["gold-svm", "other", "another"],
+                "full": ["other", "another", "third"],
+            },
+        )
+
+        self.assertEqual(result["missing_from_faiss_top_3"], ["never-found"])
+        self.assertEqual(result["dropped_by_svmrank"], ["gold-faiss"])
+        self.assertEqual(result["dropped_by_cross_encoder"], ["gold-svm"])
 
 
 if __name__ == "__main__":

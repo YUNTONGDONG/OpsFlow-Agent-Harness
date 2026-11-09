@@ -34,6 +34,8 @@ class SVMRankTrainingTest(unittest.TestCase):
         self.assertGreater(weights["dense_score"], 0)
         self.assertGreater(weights["token_overlap"], 0)
         self.assertEqual(weights["length_penalty"], 0)
+        self.assertIn("feature_means", weights)
+        self.assertIn("feature_stds", weights)
 
     def test_training_requires_ordered_pairs(self):
         row = {

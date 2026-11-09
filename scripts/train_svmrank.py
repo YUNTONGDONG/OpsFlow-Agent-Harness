@@ -12,6 +12,14 @@ FEATURES = ("dense_score", "token_overlap", "exact_phrase", "length_penalty")
 
 
 def train(rows, *, epochs: int, learning_rate: float, regularization: float):
+    matrix = np.asarray(
+        [[float(row[name]) for name in FEATURES] for row in rows],
+        dtype="float64",
+    )
+    means = matrix.mean(axis=0)
+    stds = matrix.std(axis=0)
+    stds[stds == 0] = 1.0
+
     grouped = defaultdict(list)
     for row in rows:
         grouped[row["query_id"]].append(row)
@@ -24,6 +32,7 @@ def train(rows, *, epochs: int, learning_rate: float, regularization: float):
                         np.asarray(
                             [positive[name] - negative[name] for name in FEATURES]
                         )
+                        / stds
                     )
     if not pairs:
         raise ValueError("training data has no ordered relevance pairs")
@@ -34,7 +43,14 @@ def train(rows, *, epochs: int, learning_rate: float, regularization: float):
             weights *= 1 - learning_rate * regularization
             if float(weights @ difference) < 1:
                 weights += learning_rate * difference
-    return {name: float(value) for name, value in zip(FEATURES, weights)}
+    model = {name: float(value) for name, value in zip(FEATURES, weights)}
+    model["feature_means"] = {
+        name: float(value) for name, value in zip(FEATURES, means)
+    }
+    model["feature_stds"] = {
+        name: float(value) for name, value in zip(FEATURES, stds)
+    }
+    return model
 
 
 def main() -> None:

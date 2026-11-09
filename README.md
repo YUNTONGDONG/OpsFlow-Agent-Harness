@@ -254,17 +254,35 @@ curl -X PUT http://localhost:8000/v1/users/demo-user/profile \
 curl http://localhost:8000/v1/users/demo-user/profile
 ```
 
-## Three-Stage RAG
+## RAG Retrieval and Optional Candidate Compression
 
-The knowledge pipeline in `src/harness/rag.py` uses:
+The evaluated default knowledge pipeline in `src/harness/rag.py` uses:
+
+```text
+FAISS Top-5 -> multilingual Cross-Encoder Top-3 -> Answer
+```
+
+Set `RAG_RETRIEVAL_MODE=faiss` for the fast fallback:
+
+```text
+FAISS Top-3 -> Answer
+```
+
+Set `RAG_RETRIEVAL_MODE=full` to enable the experimental compression path:
 
 ```text
 FAISS Top-100 -> SVMRank Top-20 -> Cross-Encoder Top-3 -> Answer
 ```
 
 - FAISS performs normalized-vector candidate recall.
-- SVMRank applies an offline-trained linear ranker with dense and lexical
-  features.
+- The default multilingual mMARCO Cross-Encoder and Top-5 window improved the
+  checked-in holdout evaluation over FAISS alone. Its model revision is pinned
+  in `.env.example` for reproducibility.
+- SVMRank optionally reduces Cross-Encoder work using an offline-trained linear
+  ranker. Keep it disabled until its candidate recall is validated on a
+  representative holdout set.
+- FAISS-only mode does not load Cross-Encoder or SVMRank artifacts, so it remains
+  available as a low-latency and offline fallback.
 - The Cross-Encoder scores all query-document pairs in one batch.
 - The answer includes source references and per-stage retrieval metrics.
 - If no candidate reaches `RAG_RELEVANCE_THRESHOLD`, the pipeline refuses to
@@ -280,10 +298,13 @@ Build an index from JSONL documents containing `chunk_id`, `content`, `source`,
 and optional `metadata`:
 
 ```bash
+make knowledge-chunks
 make rag-index \
   INPUT=data/knowledge_chunks.jsonl \
   FAISS_INDEX_PATH=rag_data/knowledge.faiss \
   RAG_DOCUMENTS_PATH=rag_data/documents.jsonl
+make rag-training-data
+make rag-train
 ```
 
 Evaluate retrieval ablations with a fixed dataset:
@@ -291,6 +312,19 @@ Evaluate retrieval ablations with a fixed dataset:
 ```bash
 make rag-eval DATASET=evals/rag_cases.jsonl
 ```
+
+Run one end-to-end query with the configured retrieval mode and generator:
+
+```bash
+python scripts/run_live_rag_query.py \
+  "What are the three retrieval stages in the OpsFlow knowledge pipeline?" \
+  --output logs/live_rag_query.json
+```
+
+`RAG_RELEVANCE_THRESHOLD` is a Cross-Encoder logit threshold, not a
+probability. Keep the default refusal behavior until the threshold has been
+calibrated on a representative labeled dataset. For an explicit local
+calibration experiment, pass `--threshold` to the live-query script.
 
 Real embeddings, model downloads, trained artifacts, and generator calls are
 Live Integration evidence; injected test doubles do not prove those external

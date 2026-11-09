@@ -15,23 +15,53 @@ from ..rag import (
     GeneratedAnswer,
     LinearSVMRanker,
     RetrievalDocument,
+    RetrievalMode,
     SVMRankWeights,
     ThreeStageRAGPipeline,
 )
 
 
 def build_live_knowledge_pipeline() -> ThreeStageRAGPipeline:
+    search_mode = RetrievalMode(
+        os.getenv("RAG_RETRIEVAL_MODE", "faiss_cross_encoder")
+    )
+    load_all_rerankers = (
+        os.getenv("RAG_LOAD_ALL_RERANKERS", "false").casefold() == "true"
+    )
     try:
         import faiss
-        from sentence_transformers import CrossEncoder
     except ImportError as exc:
         raise RuntimeError(
             "Install the rag dependency group before using knowledge_search"
         ) from exc
 
+    if load_all_rerankers or search_mode in {
+        RetrievalMode.FAISS_CROSS_ENCODER,
+        RetrievalMode.FULL,
+    }:
+        try:
+            from sentence_transformers import CrossEncoder
+        except ImportError as exc:
+            raise RuntimeError(
+                "Install the rag dependency group before enabling reranking"
+            ) from exc
+        cross_encoder_ranker = CrossEncoderRanker(
+            CrossEncoder(
+                os.getenv(
+                    "CROSS_ENCODER_MODEL",
+                    "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+                ),
+                revision=os.getenv("CROSS_ENCODER_REVISION") or None,
+                device=os.getenv("CROSS_ENCODER_DEVICE", "cpu"),
+            )
+        )
+    else:
+        cross_encoder_ranker = LinearSVMRanker(
+            SVMRankWeights(0, 0, 0, 0)
+        )
+
     index_path = _required_path("FAISS_INDEX_PATH")
     documents_path = _required_path("RAG_DOCUMENTS_PATH")
-    weights_path = _required_path("SVMRANK_MODEL_PATH")
     documents = _load_documents(documents_path)
     index = faiss.read_index(str(index_path))
     if index.ntotal != len(documents):
@@ -42,10 +72,15 @@ def build_live_knowledge_pipeline() -> ThreeStageRAGPipeline:
         api_key=os.getenv("EMBEDDING_API_KEY") or os.getenv("OPENAI_API_KEY"),
         base_url=os.getenv("EMBEDDING_API_BASE") or os.getenv("OPENAI_API_BASE"),
     )
-    cross_encoder = CrossEncoder(
-        os.getenv("CROSS_ENCODER_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2"),
-        device=os.getenv("CROSS_ENCODER_DEVICE", "cpu"),
-    )
+    if load_all_rerankers or search_mode in {
+        RetrievalMode.FAISS_SVM,
+        RetrievalMode.FULL,
+    }:
+        svm_ranker = LinearSVMRanker(
+            SVMRankWeights.from_json(_required_path("SVMRANK_MODEL_PATH"))
+        )
+    else:
+        svm_ranker = LinearSVMRanker(SVMRankWeights(0, 0, 0, 0))
     llm = ChatOpenAI(
         model=os.getenv("BASE_MODEL", "gpt-4o-mini"),
         api_key=os.getenv("OPENAI_API_KEY"),
@@ -91,13 +126,14 @@ def build_live_knowledge_pipeline() -> ThreeStageRAGPipeline:
             documents=documents,
             embed_query=embeddings.embed_query,
         ),
-        svm_ranker=LinearSVMRanker(SVMRankWeights.from_json(weights_path)),
-        cross_encoder_ranker=CrossEncoderRanker(cross_encoder),
+        svm_ranker=svm_ranker,
+        cross_encoder_ranker=cross_encoder_ranker,
         answerer=CallableEvidenceAnswerer(generate),
-        recall_limit=int(os.getenv("RAG_FAISS_TOP_K", "100")),
+        recall_limit=int(os.getenv("RAG_FAISS_TOP_K", "5")),
         svm_limit=int(os.getenv("RAG_SVM_TOP_K", "20")),
         final_limit=int(os.getenv("RAG_FINAL_TOP_K", "3")),
         relevance_threshold=float(os.getenv("RAG_RELEVANCE_THRESHOLD", "0")),
+        search_mode=search_mode,
     )
 
 

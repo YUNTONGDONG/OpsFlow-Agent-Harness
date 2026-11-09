@@ -20,6 +20,7 @@ __pycache__/
 logs/
 vector_db/
 vector_store/
+rag_data/
 workspaces/
 *.sqlite
 *.sqlite3

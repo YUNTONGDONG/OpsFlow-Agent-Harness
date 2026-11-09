@@ -105,6 +105,22 @@ class ThreeStageRAGPipelineTest(unittest.TestCase):
         self.assertEqual(result.sources, [])
         self.assertEqual(answer_calls, [])
 
+    def test_search_can_bypass_optional_reranking_stages(self):
+        pipeline = ThreeStageRAGPipeline(
+            retriever=FakeRetriever(documents(5)),
+            svm_ranker=RecordingRanker(),
+            cross_encoder_ranker=RecordingRanker(score_offset=1),
+            answerer=CallableEvidenceAnswerer(lambda query, evidence: "answer"),
+            search_mode=RetrievalMode.FAISS,
+        )
+
+        result = pipeline.search("E102")
+
+        self.assertEqual(
+            [item.stage for item in result.retrieval_trace],
+            ["faiss", "answer_generation"],
+        )
+
     def test_linear_svm_ranker_uses_dense_and_lexical_features(self):
         ranker = LinearSVMRanker(
             SVMRankWeights(
@@ -165,6 +181,23 @@ class ThreeStageRAGPipelineTest(unittest.TestCase):
 
                 self.assertEqual(len(selected), 3)
                 self.assertEqual([item.stage for item in trace], stages)
+
+    def test_retrieval_can_override_candidate_window_for_evaluation(self):
+        retriever = FakeRetriever(documents(30))
+        pipeline = ThreeStageRAGPipeline(
+            retriever=retriever,
+            svm_ranker=RecordingRanker(),
+            cross_encoder_ranker=RecordingRanker(score_offset=1),
+            answerer=CallableEvidenceAnswerer(lambda query, evidence: "unused"),
+        )
+
+        pipeline.retrieve(
+            "E102",
+            mode=RetrievalMode.FAISS_CROSS_ENCODER,
+            recall_limit=10,
+        )
+
+        self.assertEqual(retriever.requested_limit, 10)
 
     def test_generation_metadata_is_returned_for_observability(self):
         pipeline = ThreeStageRAGPipeline(

@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 import numpy as np
+from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 
 from src.harness.rag import RetrievalDocument
@@ -17,6 +18,7 @@ def main() -> None:
     parser.add_argument("--index", required=True, type=Path)
     parser.add_argument("--documents", required=True, type=Path)
     args = parser.parse_args()
+    load_dotenv(".env")
     try:
         import faiss
     except ImportError as exc:

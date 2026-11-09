@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from time import perf_counter
@@ -86,10 +86,15 @@ class ThreeStageRAGPipeline:
         svm_limit: int = 20,
         final_limit: int = 3,
         relevance_threshold: float = 0.0,
+        search_mode: RetrievalMode = RetrievalMode.FULL,
         refusal_answer: str = "抱歉，我在知识库中没有找到足够相关的证据。",
     ) -> None:
-        if not (recall_limit >= svm_limit >= final_limit > 0):
-            raise ValueError("RAG limits must satisfy recall >= svm >= final > 0")
+        if not (recall_limit >= final_limit > 0):
+            raise ValueError("RAG limits must satisfy recall >= final > 0")
+        if svm_limit < final_limit:
+            raise ValueError("RAG limits must satisfy svm >= final > 0")
+        if search_mode == RetrievalMode.FULL and recall_limit < svm_limit:
+            raise ValueError("Full RAG mode requires recall >= svm")
         self._retriever = retriever
         self._svm_ranker = svm_ranker
         self._cross_encoder_ranker = cross_encoder_ranker
@@ -98,10 +103,11 @@ class ThreeStageRAGPipeline:
         self._svm_limit = svm_limit
         self._final_limit = final_limit
         self._relevance_threshold = relevance_threshold
+        self._search_mode = search_mode
         self._refusal_answer = refusal_answer
 
     def search(self, query: str) -> RAGResult:
-        selected, trace = self.retrieve(query, mode=RetrievalMode.FULL)
+        selected, trace = self.retrieve(query, mode=self._search_mode)
         if not selected:
             return RAGResult(
                 answer=self._refusal_answer,
@@ -134,24 +140,38 @@ class ThreeStageRAGPipeline:
         query: str,
         *,
         mode: RetrievalMode = RetrievalMode.FULL,
+        result_limit: int | None = None,
+        recall_limit: int | None = None,
     ) -> tuple[list[RetrievalDocument], list[RetrievalStageMetrics]]:
         """Run retrieval only, including the four supported ablation modes."""
 
+        if result_limit is not None and result_limit < 1:
+            raise ValueError("result_limit must be positive")
+        if recall_limit is not None and recall_limit < 1:
+            raise ValueError("recall_limit must be positive")
+        effective_recall_limit = recall_limit or self._recall_limit
+        if mode in {RetrievalMode.FAISS_SVM, RetrievalMode.FULL}:
+            if effective_recall_limit < self._svm_limit:
+                raise ValueError("SVM retrieval requires recall >= svm")
+        output_limit = result_limit or self._final_limit
         trace: list[RetrievalStageMetrics] = []
         recalled = self._timed_stage(
             trace,
             "faiss",
-            lambda: self._retriever.retrieve(query, self._recall_limit),
+            lambda: self._retriever.retrieve(
+                query,
+                effective_recall_limit,
+            ),
         )
         if mode == RetrievalMode.FAISS:
-            selected = recalled[: self._final_limit]
+            selected = recalled[:output_limit]
         elif mode == RetrievalMode.FAISS_SVM:
             svm_ranked = self._timed_stage(
                 trace,
                 "svm_rank",
                 lambda: self._svm_ranker.rank(query, recalled, self._svm_limit),
             )
-            selected = svm_ranked[: self._final_limit]
+            selected = svm_ranked[:output_limit]
         elif mode == RetrievalMode.FAISS_CROSS_ENCODER:
             selected = self._timed_stage(
                 trace,
@@ -242,6 +262,8 @@ class SVMRankWeights:
     exact_phrase: float
     length_penalty: float
     intercept: float = 0.0
+    feature_means: dict[str, float] = field(default_factory=dict)
+    feature_stds: dict[str, float] = field(default_factory=dict)
 
     @classmethod
     def from_json(cls, path: str | Path) -> "SVMRankWeights":
@@ -266,13 +288,24 @@ class LinearSVMRanker:
             document_tokens = _tokens(document.content)
             overlap = len(query_tokens & document_tokens) / max(len(query_tokens), 1)
             exact_phrase = float(query.casefold() in document.content.casefold())
-            length_penalty = math.log1p(len(document_tokens))
+            length_penalty = -math.log1p(len(document_tokens))
+            raw_features = {
+                "dense_score": document.score,
+                "token_overlap": overlap,
+                "exact_phrase": exact_phrase,
+                "length_penalty": length_penalty,
+            }
+            normalized = {
+                name: (value - self._weights.feature_means.get(name, 0.0))
+                / self._weights.feature_stds.get(name, 1.0)
+                for name, value in raw_features.items()
+            }
             score = (
                 self._weights.intercept
-                + self._weights.dense_score * document.score
-                + self._weights.token_overlap * overlap
-                + self._weights.exact_phrase * exact_phrase
-                + self._weights.length_penalty * length_penalty
+                + self._weights.dense_score * normalized["dense_score"]
+                + self._weights.token_overlap * normalized["token_overlap"]
+                + self._weights.exact_phrase * normalized["exact_phrase"]
+                + self._weights.length_penalty * normalized["length_penalty"]
             )
             ranked.append(document.model_copy(update={"score": score}))
         return sorted(ranked, key=lambda item: item.score, reverse=True)[:limit]

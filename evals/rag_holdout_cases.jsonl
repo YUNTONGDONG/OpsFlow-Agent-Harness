@@ -1,0 +1,20 @@
+{"query":"Which runtime is used by default by the REST API, Slack adapter, and local CLI?","relevant_chunk_ids":["harness-migration-opsflow-agent-harness-migration-migration-boundary-01"]}
+{"query":"What happens when an external write times out and its final state is uncertain?","relevant_chunk_ids":["readme-opsflow-agent-harness-harness-responsibilities-read-and-write-safety-01","harness-migration-opsflow-agent-harness-migration-why-this-is-a-harness-05"]}
+{"query":"Where are request inputs, plans, step outputs, and final response evidence stored?","relevant_chunk_ids":["readme-opsflow-agent-harness-harness-responsibilities-recovery-and-evidence-01","harness-migration-opsflow-agent-harness-migration-why-this-is-a-harness-02"]}
+{"query":"What does the Skill Registry expose to constrain routing?","relevant_chunk_ids":["readme-opsflow-agent-harness-harness-responsibilities-registry-and-validated-routing-01"]}
+{"query":"How does the TaskRunner decide when a step is ready to execute?","relevant_chunk_ids":["readme-opsflow-agent-harness-harness-responsibilities-dependency-aware-execution-01"]}
+{"query":"Which business skills are included in OpsFlow?","relevant_chunk_ids":["readme-opsflow-agent-harness-included-skills-01","harness-migration-opsflow-agent-harness-migration-implemented-skills-01"]}
+{"query":"Does the default Docker demo call OpenAI, Slack, Google, or a live log platform?","relevant_chunk_ids":["readme-opsflow-agent-harness-quick-start-with-docker-01"]}
+{"query":"Which command runs all five credential-free scenarios inside the application container?","relevant_chunk_ids":["readme-opsflow-agent-harness-credential-free-demo-scenarios-01"]}
+{"query":"What is stored in Redis task state and how long is it retained by default?","relevant_chunk_ids":["readme-opsflow-agent-harness-state-and-storage-model-01"]}
+{"query":"Why must the RAG relevance threshold be calibrated instead of interpreted as a probability?","relevant_chunk_ids":["readme-opsflow-agent-harness-rag-retrieval-and-optional-candidate-compression-03"]}
+{"query":"What does PASS, SKIP, or FAIL mean in a live integration report?","relevant_chunk_ids":["live-integration-live-integration-evidence-commands-01"]}
+{"query":"Which read-only live probes are available and what configuration do they require?","relevant_chunk_ids":["live-integration-live-integration-evidence-read-probes-01"]}
+{"query":"What safeguards are required before Google or Slack live write probes run?","relevant_chunk_ids":["live-integration-live-integration-evidence-external-write-probes-01"]}
+{"query":"Which integrations were verified, skipped, or failed in the documented live snapshot?","relevant_chunk_ids":["live-integration-live-integration-evidence-current-verified-snapshot-2026-11-07-01"]}
+{"query":"What evidence proves the parallel read scenario actually executed steps concurrently?","relevant_chunk_ids":["final-state-acceptance-opsflow-agent-harness-4-demo-c-01"]}
+{"query":"What confirmation and idempotency checks are required before deleting a calendar event?","relevant_chunk_ids":["final-state-acceptance-opsflow-agent-harness-4-demo-d-01"]}
+{"query":"How should the system recover a task after the process is interrupted?","relevant_chunk_ids":["final-state-acceptance-opsflow-agent-harness-4-demo-e-01"]}
+{"query":"What must a GitHub clone support to pass reproducibility acceptance?","relevant_chunk_ids":["final-state-acceptance-opsflow-agent-harness-7-github-01"]}
+{"query":"Which items are explicitly outside the first-stage completion criteria?","relevant_chunk_ids":["final-state-acceptance-opsflow-agent-harness-9-01"]}
+{"query":"How can someone inspect the raw evidence and Workspace artifacts from deterministic demo runs?","relevant_chunk_ids":["demo-credential-free-final-state-demo-run-01","demo-credential-free-final-state-demo-inspect-evidence-01"]}

@@ -118,11 +118,15 @@ def probe_log_api() -> dict[str, Any]:
 
 
 def probe_rag_live() -> dict[str, Any]:
+    from src.harness.rag import RetrievalMode
+
+    mode = RetrievalMode(os.getenv("RAG_RETRIEVAL_MODE", "faiss_cross_encoder"))
     required = {
         "FAISS_INDEX_PATH": os.getenv("FAISS_INDEX_PATH"),
         "RAG_DOCUMENTS_PATH": os.getenv("RAG_DOCUMENTS_PATH"),
-        "SVMRANK_MODEL_PATH": os.getenv("SVMRANK_MODEL_PATH"),
     }
+    if mode in {RetrievalMode.FAISS_SVM, RetrievalMode.FULL}:
+        required["SVMRANK_MODEL_PATH"] = os.getenv("SVMRANK_MODEL_PATH")
     missing = [
         name for name, value in required.items()
         if not value or not Path(value).is_file()
@@ -132,12 +136,11 @@ def probe_rag_live() -> dict[str, Any]:
     query = os.getenv("LIVE_RAG_QUERY")
     if not query:
         raise SkipProbe("LIVE_RAG_QUERY is required")
-    from src.harness.rag import RetrievalMode
     from src.harness.skills.knowledge_pipeline import build_live_knowledge_pipeline
 
     documents, trace = build_live_knowledge_pipeline().retrieve(
         query,
-        mode=RetrievalMode.FULL,
+        mode=mode,
     )
     return {
         "selected_chunk_ids": [document.chunk_id for document in documents],
